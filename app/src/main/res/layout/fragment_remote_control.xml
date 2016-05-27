@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/tableLayout"
+    android:background="@drawable/remote_background"
     android:stretchColumns="*">
     <TextView
         android:layout_width="match_parent"
@@ -12,7 +13,9 @@
         android:id="@+id/selected_textView"
         android:gravity="center"
         android:text="0"
-        android:textSize="50dp"/>
+        android:textSize="50dp"
+        android:textColor="#FFFFFF"
+        android:background="@mipmap/window_patch_ori_9"/>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -22,8 +25,8 @@
         android:text="0"
         android:textSize="20dp"
         android:layout_margin="15dp"
-        android:background="#555555"
-        android:textColor="#cccccc"
+        android:background="@mipmap/bar_patch_ori_9"
+        android:textStyle="italic"
         />
    <!-- <TableRow
         android:layout_weight="1">
