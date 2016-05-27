@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/tableLayout"
+    android:stretchColumns="*">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:id="@+id/selected_textView"
+        android:gravity="center"
+        android:text="0"
+        android:textSize="50dp"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:id="@+id/working_textView"
+        android:gravity="center"
+        android:text="0"
+        android:textSize="20dp"
+        android:layout_margin="15dp"
+        android:background="#555555"
+        android:textColor="#cccccc"
+        />
+   <!-- <TableRow
+        android:layout_weight="1">
+        <Button
+            style="@style/RemoteButton"
+            android:id="@+id/zero_but"
+            android:text="0"/>
+        <Button
+            style="@style/RemoteButton"
+            android:id="@+id/one_but"
+            android:text="1"/>
+        <Button
+            style="@style/RemoteButton"
+            android:id="@+id/enter_but"
+            android:text="Enter"/>
+
+
+    </TableRow>-->
+    <include
+        layout="@layout/button_row"
+        android:layout_weight="1"/>
+    <include
+        layout="@layout/button_row"
+        android:layout_weight="1"/>
+    <include
+        layout="@layout/button_row"
+        android:layout_weight="1"/>
+    <TableRow
+        android:layout_weight="1">
+        <Button
+            style="@style/RemoteButton.controlButton"/>
+        <Button
+            style="@style/RemoteButton"/>
+        <Button
+            style="@style/RemoteButton.controlButton"/>
+    </TableRow>
+    <!--<include
+        layout="@layout/button_row"
+        android:layout_weight="1"/>-->
+
+
+</TableLayout>
