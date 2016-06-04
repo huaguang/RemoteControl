@@ -4,13 +4,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
-import java.io.IOException;
+
 import java.util.ArrayList;
 
 /**
@@ -46,12 +45,16 @@ public class PhotoGalleryFragment extends Fragment {
             mGridView.setAdapter(null);
         }
     }
+
+    //第三个参数为doInBackground返回结果类型。
     private class FetchItemsTask extends AsyncTask<Void,Void,ArrayList<GalleryItem>>{
         @Override
         protected ArrayList<GalleryItem> doInBackground(Void... params) {
-           return new FlickrFetchr().fetchItems();
+            ArrayList<GalleryItem> list=new FlickrFetchr().fetchItems();
+            System.out.println("已返回"+list.size());
+            return list;
         }
-
+        //此方法在主线程中运行，在doInBackground之后运行。
         @Override
         protected void onPostExecute(ArrayList<GalleryItem> galleryItems) {
             mGalleryItems=galleryItems;

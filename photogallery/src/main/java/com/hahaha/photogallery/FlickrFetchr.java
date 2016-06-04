@@ -2,6 +2,11 @@ package com.hahaha.photogallery;
 
 import android.util.Log;
 
+import junit.framework.Assert;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -46,36 +51,55 @@ public class FlickrFetchr {
     public String getUrl(String urlSpec) throws IOException {
         return new String(getUrlBytes(urlSpec));
     }
-    public ArrayList<GalleryItem> fetchItems()  {
+    public ArrayList<GalleryItem> fetchItems() {
         ArrayList<GalleryItem> galleryItems=new ArrayList<GalleryItem>();
-        String jsonResult =request(httpUrl, httpArg);
+        String jsonResult = null;
         try {
-            parseItems(galleryItems,null);
+            //由于此API最多每次返回10条信息，所以，调用10次，返回100条。
+            for(int i=0;i<100;i+=10){
+                jsonResult = request(httpUrl, httpArg);
+                parseItems(galleryItems,jsonResult);
+            }
         } catch (IOException e) {
-            Log.d(TAG,"错误11"+e);
-            return null;
-        } catch (XmlPullParserException e) {
-            Log.d(TAG,"错误12"+e);
-            return null;
+            Log.d(TAG,"failed to fetch items"+e);
+        } catch (JSONException e) {
+            Log.d(TAG,"failed to parse items"+e);
         }
-        assert jsonResult != null;
-       // String result=jsonResult.substring(0,2400);
-        Log.d(TAG,jsonResult.substring(0,200));
+        Assert.assertNotNull(jsonResult);
         return galleryItems;
     }
-    public void parseItems(ArrayList<GalleryItem> list, XmlPullParser parser) throws IOException, XmlPullParserException {
-       /* int eventType=parser.next();
-        while(eventType!=parser.END_DOCUMENT){
+ /*   public void parseItems(ArrayList<GalleryItem> list, XmlPullParser parser) throws IOException, XmlPullParserException {
+        int eventType=parser.next();
+       *//* while(eventType!=parser.END_DOCUMENT){
             if(eventType==parser.START_DOCUMENT&&XML_PHOTO.equals(parser.getName())){
                 String id=
             }
-        }*/
+        }*//*
         GalleryItem itemTemp=null;
         for(int i=0;i<3;i++){
             itemTemp=new GalleryItem();
             itemTemp.setCaption("capiton"+i);
             list.add(itemTemp);
         }
+    }*/
+    public void parseItems(ArrayList<GalleryItem> list,String jsonResult) throws JSONException {
+        JSONObject object=new JSONObject(jsonResult);
+        if(object.getInt("code")==200){ //正确代码
+            JSONArray array=object.getJSONArray("newslist");
+            JSONObject objectTemp=null;
+            GalleryItem item=null;
+            for(int i=0;i<array.length();i++){
+                objectTemp=array.getJSONObject(i);
+                item=new GalleryItem();
+                item.setCaption(objectTemp.getString("title"));
+                item.setCTime(objectTemp.getString("ctime"));
+                item.setOriUrl(objectTemp.getString("url"));
+                item.setUrl(objectTemp.getString("picUrl"));
+                item.setId(String.valueOf(i));
+                list.add(item);
+            }
+        }
+
     }
 
 
@@ -89,84 +113,32 @@ public class FlickrFetchr {
      *            :参数
      * @return 返回结果
      */
-    public static String request(String httpUrl, String httpArg) {
+    public static String request(String httpUrl, String httpArg) throws IOException {
         BufferedReader reader = null;
         String result = null;
         StringBuffer sbf = new StringBuffer();
         httpUrl = httpUrl + "?" + httpArg;
-        URL url = null;
-        try {
-            url = new URL(httpUrl);
-        } catch (MalformedURLException e) {
-            Log.d(TAG,"错误1："+e);
-            return null;
-        }
-        HttpURLConnection connection = null;
-        try {
-            connection = (HttpURLConnection) url.openConnection();
-        } catch (IOException e) {
-            Log.d(TAG,"错误2："+e);
-            return null;
-        }
-        try {
-            connection.setRequestMethod("GET");
-        } catch (ProtocolException e) {
-            Log.d(TAG,"错误3："+e);
-            return null;
-        }
-        // 填入apikey到HTTP header
+        URL url = new URL(httpUrl);
+
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
         connection.setRequestProperty("apikey",  "ba2d4d0f184210a912ce55443a575031");
-        try {
-            connection.connect();
-        } catch (IOException e) {
-            Log.d(TAG,"错误1："+e);
+        InputStream is = connection.getInputStream();
+        if(connection.getResponseCode()!=HttpURLConnection.HTTP_OK){
+            Log.d(TAG,"返回错误"+connection.getResponseCode());
             return null;
         }
-        InputStream is = null;
-        try {
-            is = connection.getInputStream();
-        } catch (IOException e) {
-            Log.d(TAG,"错误4："+e);
-            return null;
-        }
-        try {
-            if(connection.getResponseCode()!=HttpURLConnection.HTTP_OK){
-                Log.d(TAG,"错误9："+connection.getResponseCode());
-                return null;
-            }
-        } catch (IOException e) {
-            Log.d(TAG,"错误10："+e);
-            return null;
-        }
-        try {
-            int code=connection.getResponseCode();
-        } catch (IOException e) {
-            Log.d(TAG,"错误5："+e);
-            return null;
-        }
-        try {
-            reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            Log.d(TAG,"错误6："+e);
-            return null;
-        }
+        reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
         String strRead = null;
-        try {
-            while ((strRead = reader.readLine()) != null) {
-                sbf.append(strRead);
-                sbf.append("\r\n");
-            }
-        } catch (IOException e) {
-            Log.d(TAG,"错误7："+e);
-            return null;
+        while ((strRead = reader.readLine()) != null) {
+            sbf.append(strRead);
+            sbf.append("\r\n");
         }
-        try {
-            reader.close();
-        } catch (IOException e) {
-            Log.d(TAG,"错误8："+e);
-            return null;
-        }
+
         result = sbf.toString();
+
+        if(reader!=null)
+           reader.close();
         if(connection!=null){
             connection.disconnect();
         }

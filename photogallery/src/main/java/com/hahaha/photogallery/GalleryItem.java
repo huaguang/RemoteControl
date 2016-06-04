@@ -4,11 +4,29 @@ package com.hahaha.photogallery;
  * Created by Guang on 2016/5/27.
  */
 public class GalleryItem {
-    private String mCaption;
+    private String mCaption;    //title
     private String mId;
-    private String mUrl;
+    private String mUrl;    //picUrl    图片地址
+    private String mCTime;
+    private String mOriUrl; //url      图片原网址
+
+    public String getCTime() {
+        return mCTime;
+    }
+
+    public void setCTime(String CTime) {
+        mCTime = CTime;
+    }
+
+    public String getOriUrl() {
+        return mOriUrl;
+    }
+
+    public void setOriUrl(String oriUrl) {
+        mOriUrl = oriUrl;
+    }
     public String toString(){
-        return mCaption;
+        return mId+mCaption;
     }
 
     public String getCaption() {
