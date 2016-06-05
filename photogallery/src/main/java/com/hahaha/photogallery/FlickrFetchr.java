@@ -7,19 +7,13 @@ import junit.framework.Assert;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -28,7 +22,6 @@ import java.util.ArrayList;
  */
 public class FlickrFetchr {
     private static final String TAG="FlickrFetchr";
-    private static final String XML_PHOTO="photo";
     byte[] getUrlBytes(String urlSpec) throws IOException {
         URL url=new URL(urlSpec);
         HttpURLConnection connection= (HttpURLConnection) url.openConnection();
@@ -116,7 +109,7 @@ public class FlickrFetchr {
     public static String request(String httpUrl, String httpArg) throws IOException {
         BufferedReader reader = null;
         String result = null;
-        StringBuffer sbf = new StringBuffer();
+        StringBuilder sbf = new StringBuilder();
         httpUrl = httpUrl + "?" + httpArg;
         URL url = new URL(httpUrl);
 
@@ -136,12 +129,9 @@ public class FlickrFetchr {
         }
 
         result = sbf.toString();
+        connection.disconnect();
+        reader.close();
 
-        if(reader!=null)
-           reader.close();
-        if(connection!=null){
-            connection.disconnect();
-        }
 
         return result;
     }
