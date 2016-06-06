@@ -1,13 +1,19 @@
 package com.hahaha.photogallery;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -27,8 +33,11 @@ public class PhotoGalleryFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         setRetainInstance(true);
-        new FetchItemsTask().execute();
+
+        updateItems();
+
         mThumbnailThread=new ThumbnailDownLoader<ImageView>(new Handler());
         mThumbnailThread.setListener(new ThumbnailDownLoader.Listener<ImageView>() {
             @Override
@@ -41,7 +50,10 @@ public class PhotoGalleryFragment extends Fragment {
         });
         mThumbnailThread.start();
         mThumbnailThread.getLooper();
-        Log.d(TAG,"mThumbnailThread Starts");
+       // Log.d(TAG,"mThumbnailThread Starts");
+    }
+    public void updateItems(){
+         new FetchItemsTask().execute();
     }
     @Nullable
     @Override
@@ -66,9 +78,17 @@ public class PhotoGalleryFragment extends Fragment {
     private class FetchItemsTask extends AsyncTask<Void,Void,ArrayList<GalleryItem>>{
         @Override
         protected ArrayList<GalleryItem> doInBackground(Void... params) {
-            ArrayList<GalleryItem> list=new FlickrFetchr().fetchItems();
-           // System.out.println("已返回"+list.size());
-            return list;
+            Activity activity=getActivity();
+            if(activity==null)
+                return new ArrayList<GalleryItem>();
+
+            String query= PreferenceManager.getDefaultSharedPreferences(activity)
+                        .getString(FlickrFetchr.PREF_SEARCH_QUERY,null);
+            if(query==null){
+                return new FlickrFetchr().fetchItems();
+            }else{
+                return new FlickrFetchr().search(query);
+            }
         }
         //此方法在主线程中运行，在doInBackground之后运行。
         @Override
@@ -97,6 +117,31 @@ public class PhotoGalleryFragment extends Fragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_photo_gallery,menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.menu_item_search:{
+                getActivity().onSearchRequested();
+                return true;
+            }
+            case R.id.menu_item_clear:{
+                PreferenceManager.getDefaultSharedPreferences(getActivity())
+                        .edit().putString(FlickrFetchr.PREF_SEARCH_QUERY,null).commit();
+                updateItems();
+                return true;
+            }
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         mThumbnailThread.clearQueue();
@@ -106,7 +151,7 @@ public class PhotoGalleryFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         mThumbnailThread.quit();    //退出子线程；
-        Log.d(TAG,"mThumbnailThread destroyed");
+    //    Log.d(TAG,"mThumbnailThread destroyed");
 
     }
 }

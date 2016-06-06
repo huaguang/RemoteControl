@@ -1,5 +1,7 @@
 package com.hahaha.photogallery;
 
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import junit.framework.Assert;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
  */
 public class FlickrFetchr {
     private static final String TAG="FlickrFetchr";
+    public static final String PREF_SEARCH_QUERY="searchQuery";
     byte[] getUrlBytes(String urlSpec) throws IOException {
         URL url=new URL(urlSpec);
         HttpURLConnection connection= (HttpURLConnection) url.openConnection();
@@ -43,6 +46,12 @@ public class FlickrFetchr {
     }
     public String getUrl(String urlSpec) throws IOException {
         return new String(getUrlBytes(urlSpec));
+    }
+
+    public ArrayList<GalleryItem> search(String query){
+        Log.d(TAG,"SEARCH:"+query);
+
+        return fetchItems();
     }
     public ArrayList<GalleryItem> fetchItems() {
         ArrayList<GalleryItem> galleryItems=new ArrayList<GalleryItem>();

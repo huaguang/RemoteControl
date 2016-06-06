@@ -1,15 +1,20 @@
 package com.hahaha.photogallery;
 
 
+import android.app.SearchManager;
+import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.util.Log;
 
 /**
  * Created by Guang on 2016/5/18.
  */
 public abstract class SingleFragmentActivity extends FragmentActivity {
+
     protected abstract Fragment CreateFragment();
 
     @Override
@@ -24,6 +29,9 @@ public abstract class SingleFragmentActivity extends FragmentActivity {
         }
 
     }
+
+
+
     protected int getLayoutResId(){
         return R.layout.activity_fragment;
     }

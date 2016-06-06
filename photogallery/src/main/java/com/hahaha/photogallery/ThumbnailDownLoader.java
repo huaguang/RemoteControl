@@ -13,6 +13,7 @@ import android.util.LruCache;
 import junit.framework.Assert;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -82,7 +83,7 @@ public class ThumbnailDownLoader<Token> extends HandlerThread {
                 bitmapT= BitmapFactory.decodeByteArray(bitmapByte,0,bitmapByte.length);
                 mLruCache.put(url,bitmapT);
             }
-            Log.d(TAG,"hitCount:"+ mLruCache.hitCount()+"\tmissCount:"+mLruCache.missCount()+"mLruSize:"+mLruCache.size());
+          //  Log.d(TAG,"hitCount:"+ mLruCache.hitCount()+"\tmissCount:"+mLruCache.missCount()+"mLruSize:"+mLruCache.size());
             final Bitmap bitmap=bitmapT;
             //  Log.i(TAG,"bitmap created");
             mResponseHandler.post(new Runnable() {
