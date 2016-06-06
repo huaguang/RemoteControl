@@ -8,6 +8,9 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.util.Log;
+import android.util.LruCache;
+
+import junit.framework.Assert;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -27,6 +30,8 @@ public class ThumbnailDownLoader<Token> extends HandlerThread {
     private Handler mResponseHandler;   //接受主线程传递过来的mHandler，以完成信息传递。
     private Listener<Token> mListener;  //消息
 
+    private LruCache<String,Bitmap> mLruCache;
+
     public interface Listener<Token>{
         void onThumbnailDownloaded(Token token,Bitmap  thumbnail);
     }
@@ -37,6 +42,14 @@ public class ThumbnailDownLoader<Token> extends HandlerThread {
     public ThumbnailDownLoader(Handler handler) {
         super(TAG);
         mResponseHandler=handler;
+        mLruCache=new LruCache<String,Bitmap>(50);/*{
+            @Override
+            protected int sizeOf(String key, Bitmap value) {
+               // Assert.assertEquals(1520000,value.getByteCount());
+              //  Log.d(TAG,"Size:"+value.getByteCount());
+               // return value.getByteCount();
+            }
+        };*/
     }
 
     //在Looper第一次检查消息队列之前调用此方法。
@@ -62,11 +75,16 @@ public class ThumbnailDownLoader<Token> extends HandlerThread {
             if(url==null){
                 return;
             }
-
-            byte[] bitmapByte=new FlickrFetchr().getUrlBytes(url);
-            final Bitmap bitmap= BitmapFactory.decodeByteArray(bitmapByte,0,bitmapByte.length);
-          //  Log.i(TAG,"bitmap created");
-
+            //好蠢的做法啊！！！！。。
+            Bitmap bitmapT=null;
+            if((bitmapT=mLruCache.get(url))==null){
+                byte[] bitmapByte=new FlickrFetchr().getUrlBytes(url);
+                bitmapT= BitmapFactory.decodeByteArray(bitmapByte,0,bitmapByte.length);
+                mLruCache.put(url,bitmapT);
+            }
+            Log.d(TAG,"hitCount:"+ mLruCache.hitCount()+"\tmissCount:"+mLruCache.missCount()+"mLruSize:"+mLruCache.size());
+            final Bitmap bitmap=bitmapT;
+            //  Log.i(TAG,"bitmap created");
             mResponseHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -74,7 +92,7 @@ public class ThumbnailDownLoader<Token> extends HandlerThread {
                         return;
                     }
                     requestMap.remove(token);
-                    Log.d(TAG,"Run():  current Thread"+Thread.currentThread().getName());
+                //    Log.d(TAG,"Run():  current Thread"+Thread.currentThread().getName());
                     mListener.onThumbnailDownloaded(token,bitmap);
                 }
             });

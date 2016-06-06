@@ -35,7 +35,7 @@ public class PhotoGalleryFragment extends Fragment {
             public void onThumbnailDownloaded(ImageView imageView, Bitmap thumbnail) {
                 if(isVisible()){
                     imageView.setImageBitmap(thumbnail);
-                    Log.d(TAG,"SetImageBitMap():  current Thread"+Thread.currentThread().getName());
+                  //  Log.d(TAG,"SetImageBitMap():  current Thread"+Thread.currentThread().getName());
                 }
             }
         });
@@ -67,7 +67,7 @@ public class PhotoGalleryFragment extends Fragment {
         @Override
         protected ArrayList<GalleryItem> doInBackground(Void... params) {
             ArrayList<GalleryItem> list=new FlickrFetchr().fetchItems();
-            System.out.println("已返回"+list.size());
+           // System.out.println("已返回"+list.size());
             return list;
         }
         //此方法在主线程中运行，在doInBackground之后运行。
@@ -83,7 +83,6 @@ public class PhotoGalleryFragment extends Fragment {
         public GalleryItemAdapter(ArrayList<GalleryItem> list){
             super(getActivity(),0,list);
         }
-
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if(convertView==null){
