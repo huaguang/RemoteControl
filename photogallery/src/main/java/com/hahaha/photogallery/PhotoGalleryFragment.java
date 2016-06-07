@@ -5,6 +5,7 @@ import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -31,7 +32,7 @@ import java.util.ArrayList;
 /**
  * Created by Guang on 2016/5/27.
  */
-public class PhotoGalleryFragment extends Fragment {
+public class PhotoGalleryFragment extends VisibleFragment {
     private static  final String TAG="PhotoGalleryFragment";
     private ArrayList<GalleryItem> mGalleryItems;
     private GridView mGridView;
@@ -56,7 +57,10 @@ public class PhotoGalleryFragment extends Fragment {
         });
         mThumbnailThread.start();
         mThumbnailThread.getLooper();
-       // Log.d(TAG,"mThumbnailThread Starts");
+        /*Intent i=new Intent(getActivity(),PollService.class);
+        getActivity().startService(i);*/
+  //      PollService.setServiceAlarm(getActivity(),true);
+
     }
     public void updateItems(){
          new FetchItemsTask().execute();
@@ -143,7 +147,7 @@ public class PhotoGalleryFragment extends Fragment {
         switch (item.getItemId()){
             case R.id.menu_item_search:{
                 getActivity().onSearchRequested();
-
+             //   getActivity().startSearch("Search",false,null,false);
                 return true;
             }
             case R.id.menu_item_clear:{
@@ -152,10 +156,32 @@ public class PhotoGalleryFragment extends Fragment {
                 updateItems();
                 return true;
             }
+            case R.id.menu_item_toggle_poll:{
+                boolean shouldStartAlarm=!PollService.isServiceAlarmOn(getActivity());
+                PollService.setServiceAlarm(getActivity(),shouldStartAlarm);
+
+                if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB){
+                    getActivity().invalidateOptionsMenu();
+                }
+                return true;
+            }
             default:
                 return super.onOptionsItemSelected(item);
         }
 
+    }
+    //每次菜单需要重新配置时调用
+    //在3.0版本以前，每次显示菜单时自动调用，在3.0及以后，需要在invalidateOptionMenu()调用后，才会调用。
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        MenuItem item=menu.findItem(R.id.menu_item_toggle_poll);
+        if(PollService.isServiceAlarmOn(getActivity())){
+            item.setTitle(R.string.stop_poll);
+        }else{
+            item.setTitle(R.string.start_poll);
+        }
     }
 
     @Override

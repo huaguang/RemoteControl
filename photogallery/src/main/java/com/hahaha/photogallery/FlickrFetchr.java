@@ -25,6 +25,7 @@ import java.util.ArrayList;
 public class FlickrFetchr {
     private static final String TAG="FlickrFetchr";
     public static final String PREF_SEARCH_QUERY="searchQuery";
+    public static final String PREF_LAST_RESULT_ID="lastResultId";
     byte[] getUrlBytes(String urlSpec) throws IOException {
         URL url=new URL(urlSpec);
         HttpURLConnection connection= (HttpURLConnection) url.openConnection();
@@ -67,7 +68,7 @@ public class FlickrFetchr {
         } catch (JSONException e) {
             Log.d(TAG,"failed to parse items"+e);
         }
-        Assert.assertNotNull(jsonResult);
+      //  Assert.assertNotNull(jsonResult);
         return galleryItems;
     }
  /*   public void parseItems(ArrayList<GalleryItem> list, XmlPullParser parser) throws IOException, XmlPullParserException {

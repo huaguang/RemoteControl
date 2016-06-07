@@ -16,4 +16,9 @@
         android:title="@string/clear"
         android:showAsAction="ifRoom|withText"
         tools:ignore="AppCompatResource"/>
+    <item
+        android:id="@+id/menu_item_toggle_poll"
+        android:title="@string/start_poll"
+        android:showAsAction="ifRoom"
+        tools:ignore="AppCompatResource"/>
 </menu>
