@@ -18,4 +18,6 @@ public class StartupReceiver extends BroadcastReceiver {
         boolean isOn= PreferenceManager.getDefaultSharedPreferences(context).getBoolean(PollService.PREF_IS_ALARM_ON,false);
         PollService.setServiceAlarm(context,isOn);
     }
+
+
 }

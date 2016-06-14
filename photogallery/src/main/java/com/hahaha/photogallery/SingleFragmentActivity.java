@@ -27,11 +27,7 @@ public abstract class SingleFragmentActivity extends FragmentActivity {
             fragment=CreateFragment();
             fm.beginTransaction().add(R.id.fragmentContainer,fragment).commit();
         }
-
     }
-
-
-
     protected int getLayoutResId(){
         return R.layout.activity_fragment;
     }

@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -60,7 +62,6 @@ public class PhotoGalleryFragment extends VisibleFragment {
         /*Intent i=new Intent(getActivity(),PollService.class);
         getActivity().startService(i);*/
   //      PollService.setServiceAlarm(getActivity(),true);
-
     }
     public void updateItems(){
          new FetchItemsTask().execute();
@@ -71,6 +72,18 @@ public class PhotoGalleryFragment extends VisibleFragment {
         View v=inflater.inflate(R.layout.fragment_photo_gallery,container,false);
         mGridView=(GridView)v.findViewById(R.id.gridView);
         setUpAdapter();
+        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                GalleryItem item=mGalleryItems.get(position);
+
+                Uri uri= Uri.parse(item.getOriUrl());
+               // Intent i=new Intent(Intent.ACTION_VIEW,uri);  //这是调用隐式Activity
+                Intent i=new Intent(getActivity(),PhotoPageActivity.class);
+                i.setData(uri);
+                startActivity(i);
+            }
+        });
         return v;
     }
     private void setUpAdapter(){
@@ -137,9 +150,7 @@ public class PhotoGalleryFragment extends VisibleFragment {
             ComponentName name=getActivity().getComponentName();
             SearchableInfo searchableInfo=searchManager.getSearchableInfo(name);
             searchView.setSearchableInfo(searchableInfo);
-
         }
-
     }
 
     @Override

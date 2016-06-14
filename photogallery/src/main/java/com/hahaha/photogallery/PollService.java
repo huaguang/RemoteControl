@@ -90,7 +90,6 @@ public class PollService extends IntentService {
             pi.cancel();
         }
         PreferenceManager.getDefaultSharedPreferences(context).edit().putBoolean(PREF_IS_ALARM_ON,isOn).commit();
-
     }
     public static boolean isServiceAlarmOn(Context context){
         Intent i=new Intent(context,PollService.class);
